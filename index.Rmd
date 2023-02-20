@@ -24,4 +24,6 @@ TOOL - 'Bottom' and 'Ticks & Leeches'; Both songs have very quiet build-up parts
 
 ### Plots
 ![Valence vs Energy](valence_energy)
+This plot shows the valence on the x-axis, the energy on the y-axis, the mode is represented color and the loudness is represented by size.\
 ![Danceability vs Tempo](danceability_tempo)
+This plot shows the danceability on the x-axis, the tempo on the y-axis, the time signature is represented by the color and the song's duration is represented by the size.\
