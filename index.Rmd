@@ -23,3 +23,5 @@ Opeth - 'The Leper Affinity'; Good example of Opeth's dynamics.\
 TOOL - 'Bottom' and 'Ticks & Leeches'; Both songs have very quiet build-up parts in the middle.\
 
 ### Plots
+![Valence vs Energy](valence_energy)
+![Danceability vs Tempo](danceability_tempo)
