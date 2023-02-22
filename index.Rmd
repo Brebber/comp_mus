@@ -2,7 +2,9 @@
 title: "My portfolio"
 author: "Brent Brakenhoff"
 date: "`r Sys.Date()`"
-output: html_document
+output: 
+  flexdashboard::flex_dashboard:
+    storyboard: true
 ---
 
 [Link to my corpus playlist](https://open.spotify.com/playlist/4jOlWW7XLRli6rjThfqlVl?si=a3a77a09d703483a)\

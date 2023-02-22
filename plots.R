@@ -1,5 +1,6 @@
 library(tidyverse)
 library(spotifyr)
+library(plotly)
 metal <- get_playlist_audio_features("", "4jOlWW7XLRli6rjThfqlVl?si=781f9fafb8574da1")
 rock <- get_playlist_audio_features("", "43rPmb2v9YWmbotTymQLQE?si=fd6f70a6a61045a3")
 corpus <-
@@ -8,7 +9,7 @@ corpus <-
     metal |> mutate(genre = "Metal")
   )
 
-corpus |>                    # Start with corpus.
+plot_1 <- corpus |>                    # Start with corpus.
   mutate(
     mode = ifelse(mode == 0, "Minor", "Major")
   ) |>
@@ -22,26 +23,7 @@ corpus |>                    # Start with corpus.
   ) +
   geom_point() +              # Scatter plot.
   geom_rug(linewidth = 0.1) + # Add 'fringes' to show data distribution.
-  geom_text(                  # Add text labels from above.
-    aes(
-      x = valence,
-      y = energy,
-      label = label
-    ),
-    data = 
-      tibble(
-        label = c("", ""),
-        category = c("Edisons", "Grammys"),
-        valence = c(0.090, 0.123),
-        energy = c(0.101, 0.967)
-      ),
-    colour = "black",         # Override colour (not mode here).
-    size = 3,                 # Override size (not loudness here).
-    hjust = "left",           # Align left side of label with the point.
-    vjust = "bottom",         # Align bottom of label with the point.
-    nudge_x = -0.05,          # Nudge the label slightly left.
-    nudge_y = 0.02            # Nudge the label slightly up.
-  ) +
+
   facet_wrap(~ genre) +    # Separate charts per playlist.
   scale_x_continuous(         # Fine-tune the x axis.
     limits = c(0, 1),
@@ -67,7 +49,7 @@ corpus |>                    # Start with corpus.
     y = "Energy",
     colour = "Mode"
   )
-
+ggplotly(p = plot_1)
 
 corpus |>                    # Start with corpus.
   mutate(
@@ -84,26 +66,6 @@ corpus |>                    # Start with corpus.
   ) +
   geom_point() +              # Scatter plot.
   geom_rug(linewidth = 0.1) + # Add 'fringes' to show data distribution.
-  geom_text(                  # Add text labels from above.
-    aes(
-      x = danceability,
-      y = tempo,
-      label = label
-    ),
-    data = 
-      tibble(
-        label = c("", ""),
-        category = c("Edisons", "Grammys"),
-        danceability = c(0.090, 0.123),
-        tempo = c(0.101, 0.967)
-      ),
-    colour = "black",         # Override colour (not mode here).
-    size = 3,                 # Override size (not loudness here).
-    hjust = "left",           # Align left side of label with the point.
-    vjust = "bottom",         # Align bottom of label with the point.
-    nudge_x = -0.05,          # Nudge the label slightly left.
-    nudge_y = 0.02            # Nudge the label slightly up.
-  ) +
   facet_wrap(~ genre) +    # Separate charts per playlist.
   scale_x_continuous(         # Fine-tune the x axis.
     limits = c(0, 1),
