@@ -8,7 +8,6 @@ corpus <-
     rock |> mutate(genre = "Rock"),
     metal |> mutate(genre = "Metal")
   )
-
 plot_1 <- corpus |>                    # Start with corpus.
   mutate(
     mode = ifelse(mode == 0, "Minor", "Major")
