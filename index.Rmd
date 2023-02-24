@@ -149,7 +149,7 @@ to_sirius <-
   select(segments) |>
   unnest(segments) |>
   select(start, duration, pitches)
-to_sirius |>
+plot_3 <- to_sirius |>
   mutate(pitches = map(pitches, compmus_normalise, "euclidean")) |>
   compmus_gather_chroma() |> 
   ggplot(
@@ -164,6 +164,7 @@ to_sirius |>
   labs(x = "Time (s)", y = NULL, fill = "Magnitude") +
   theme_minimal() +
   scale_fill_viridis_c()
+ggplotly(p=plot_3)
 ```
 
 ***
@@ -176,7 +177,7 @@ creep <-
   select(segments) |>
   unnest(segments) |>
   select(start, duration, pitches)
-creep |>
+plot_4 <- creep |>
   mutate(pitches = map(pitches, compmus_normalise, "euclidean")) |>
   compmus_gather_chroma() |> 
   ggplot(
@@ -191,6 +192,7 @@ creep |>
   labs(x = "Time (s)", y = NULL, fill = "Magnitude") +
   theme_minimal() +
   scale_fill_viridis_c()
+ggplotly(p = plot_4)
 ```
 
 ***
