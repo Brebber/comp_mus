@@ -1,10 +1,13 @@
 ---
-title: "The blurry line between rock and metal"
+title: "The Blurry Line between Rock and Metal"
 author: "Brent Brakenhoff"
 date: "`r Sys.Date()`"
 output: 
   flexdashboard::flex_dashboard:
     storyboard: true
+    theme: 
+      version: 5
+      bootswatch: yeti
 ---
 ```{r setup, include=FALSE}
 library(tidyverse)
@@ -136,4 +139,4 @@ ggplotly(p = plot_2)
 ```
 ***
 
-From these variables it's hard to make a clear distinction between genres, as both seem to follow a similar distribution. Rock music's danceability seems to be slightly higher on average, but the tempo of the songs in both genres varies wildly.\
+From these variables it's hard to make a clear distinction between genres, as both seem to follow a similar distribution. Rock music's danceability seems to be slightly higher on average, but the tempo of the songs in both genres varies widely.\
