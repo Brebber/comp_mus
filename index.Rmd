@@ -1,15 +1,28 @@
 ---
-title: "My portfolio"
+title: "The blurry line between rock and metal"
 author: "Brent Brakenhoff"
 date: "`r Sys.Date()`"
 output: 
   flexdashboard::flex_dashboard:
     storyboard: true
 ---
+```{r setup, include=FALSE}
+library(tidyverse)
+library(spotifyr)
+library(plotly)
+metal <- get_playlist_audio_features("", "4jOlWW7XLRli6rjThfqlVl?si=781f9fafb8574da1")
+rock <- get_playlist_audio_features("", "43rPmb2v9YWmbotTymQLQE?si=fd6f70a6a61045a3")
+corpus <-
+  bind_rows(
+    rock |> mutate(genre = "Rock"),
+    metal |> mutate(genre = "Metal")
+  )
 
-[Link to my corpus playlist](https://open.spotify.com/playlist/4jOlWW7XLRli6rjThfqlVl?si=a3a77a09d703483a)\
+```
 
-### Corpus
+
+### Introducing my taste in music
+[Link to my corpus playlist](https://open.spotify.com/playlist/09ybINQumucmE0BMdYakx2?si=4e120648fadf491b)\
 I have chosen 10 bands, 5 of which are not considered metal bands and 5 of which are considered metal bands. My goal is to see how easily distinguishable these genres actually are if we looked at the Spotify statistics.\
 
 #### Band selection
@@ -28,8 +41,99 @@ Led Zeppelin - 'Immigrant Song'; Considered "proto-metal", influential on the ge
 Opeth - 'The Leper Affinity'; Good example of Opeth's dynamics.\
 TOOL - 'Bottom' and 'Ticks & Leeches'; Both songs have very quiet build-up parts in the middle.\
 
-### Plots
-![Valence vs Energy](valence_energy)\
-This plot shows the valence on the x-axis, the energy on the y-axis, the mode is represented color and the loudness is represented by size.\
-![Danceability vs Tempo](danceability_tempo)\
-This plot shows the danceability on the x-axis, the tempo on the y-axis, the time signature is represented by the color and the song's duration is represented by the size.\
+### Is metal that much angrier?
+```{r valen}
+plot_1 <- corpus |>                    # Start with corpus.
+  mutate(
+    mode = ifelse(mode == 0, "Minor", "Major"),
+    name = corpus$track.name
+  ) |>
+  ggplot(                     # Set up the plot.
+    aes(
+      name = name,
+      x = valence,
+      y = energy,
+      size = loudness,
+      colour = mode
+    )
+  ) +
+  geom_point() +              # Scatter plot.
+  geom_rug(linewidth = 0.1) + # Add 'fringes' to show data distribution.
+
+  facet_wrap(~ genre) +    # Separate charts per playlist.
+  scale_x_continuous(         # Fine-tune the x axis.
+    limits = c(0, 1),
+    breaks = c(0, 0.50, 1),   # Use grid-lines for quadrants only.
+    minor_breaks = NULL       # Remove 'minor' grid-lines.
+  ) +
+  scale_y_continuous(         # Fine-tune the y axis in the same way.
+    limits = c(0, 1),
+    breaks = c(0, 0.50, 1),
+    minor_breaks = NULL
+  ) +
+  scale_colour_brewer(        # Use the Color Brewer to choose a palette.
+    type = "qual",            # Qualitative set.
+    palette = "Set1"        # Name of the palette is 'Paired'.
+  ) +
+  scale_size_continuous(      # Fine-tune the sizes of each point.
+    trans = "exp",            # Use an exp transformation to emphasise loud.
+    guide = "none"            # Remove the legend for size.
+  ) +
+  theme_minimal() +             # Use a simpler theme.
+  labs(                       # Make the titles nice.
+    x = "Valence",
+    y = "Energy",
+    colour = "Mode"
+  )
+ggplotly(p = plot_1)
+```
+***
+By looking at this plot it's very clear to see that the songs in the metal part of the playlist are a lot more clustered toward high energy and low valence. The rock songs seem to be a lot more scattered, which could be explained by the variety of rock subgenres in that part of the playlist.\
+
+
+### What about rhythm?
+```{r dance}
+plot_2 <- corpus |>                    # Start with corpus.
+  mutate(
+    name = corpus$track.name,
+    duration = track.duration_ms,
+    time_signature = ifelse(time_signature == 4, "Even", "Odd")
+  ) |>
+  ggplot(                     # Set up the plot.
+    aes(
+      name = name,
+      x = danceability,
+      y = tempo,
+      size = duration,
+      colour = time_signature
+    )
+  ) +
+  geom_point() +              # Scatter plot.
+  geom_rug(linewidth = 0.1) + # Add 'fringes' to show data distribution.
+  facet_wrap(~ genre) +    # Separate charts per playlist.
+  scale_x_continuous(         # Fine-tune the x axis.
+    limits = c(0, 1),
+    breaks = c(0, 0.50, 1),   # Use grid-lines for quadrants only.
+    minor_breaks = NULL       # Remove 'minor' grid-lines.
+  ) +
+  scale_y_continuous(         # Fine-tune the y axis in the same way.
+    limits = c(60, 200),
+    breaks = c(60, 130, 200),
+    minor_breaks = NULL
+  ) +
+  scale_colour_brewer(        # Use the Color Brewer to choose a palette.
+    type = "qual",            # Qualitative set.
+    palette = "Set1"        # Name of the palette is 'Paired'.
+  ) +
+  theme_minimal() +             # Use a simpler theme.
+  labs(                       # Make the titles nice.
+    x = "Danceability",
+    y = "Tempo",
+    colour = "Time signature",
+    size = ''
+  )
+ggplotly(p = plot_2)
+```
+***
+
+From these variables it's hard to make a clear distinction between genres, as both seem to follow a similar distribution. Rock music's danceability seems to be slightly higher on average, but the tempo of the songs in both genres varies wildly.\

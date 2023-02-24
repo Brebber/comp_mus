@@ -8,18 +8,18 @@ corpus <-
     rock |> mutate(genre = "Rock"),
     metal |> mutate(genre = "Metal")
   )
-
 plot_1 <- corpus |>                    # Start with corpus.
   mutate(
-    mode = ifelse(mode == 0, "Minor", "Major")
+    mode = ifelse(mode == 0, "Minor", "Major"),
+    name = corpus$track.name
   ) |>
   ggplot(                     # Set up the plot.
     aes(
+      name = name,
       x = valence,
       y = energy,
       size = loudness,
-      colour = mode,
-      name = corpus$track.name
+      colour = mode
     )
   ) +
   geom_point() +              # Scatter plot.
@@ -38,13 +38,13 @@ plot_1 <- corpus |>                    # Start with corpus.
   ) +
   scale_colour_brewer(        # Use the Color Brewer to choose a palette.
     type = "qual",            # Qualitative set.
-    palette = "Paired"        # Name of the palette is 'Paired'.
+    palette = "Set1"        # Name of the palette is 'Paired'.
   ) +
   scale_size_continuous(      # Fine-tune the sizes of each point.
     trans = "exp",            # Use an exp transformation to emphasise loud.
     guide = "none"            # Remove the legend for size.
   ) +
-  theme_light() +             # Use a simpler theme.
+  theme_minimal() +             # Use a simpler theme.
   labs(                       # Make the titles nice.
     x = "Valence",
     y = "Energy",
@@ -52,16 +52,18 @@ plot_1 <- corpus |>                    # Start with corpus.
   )
 ggplotly(p = plot_1)
 
-corpus |>                    # Start with corpus.
+plot_2 <- corpus |>                    # Start with corpus.
   mutate(
-    time_signature = ifelse(time_signature == 4,"even","odd"),
-    track.duration_ms = 0.001 * track.duration_ms
+    name = corpus$track.name,
+    duration = track.duration_ms,
+    time_signature = ifelse(time_signature == 4, "Even", "Odd")
   ) |>
   ggplot(                     # Set up the plot.
     aes(
+      name = name,
       x = danceability,
       y = tempo,
-      size = track.duration_ms,
+      size = duration,
       colour = time_signature
     )
   ) +
@@ -80,17 +82,13 @@ corpus |>                    # Start with corpus.
   ) +
   scale_colour_brewer(        # Use the Color Brewer to choose a palette.
     type = "qual",            # Qualitative set.
-    palette = "Paired"        # Name of the palette is 'Paired'.
+    palette = "Set1"        # Name of the palette is 'Paired'.
   ) +
-  scale_size_continuous(      # Fine-tune the sizes of each point.
-    trans = "exp",            # Use an exp transformation to emphasise loud.
-    guide = "none"            # Remove the legend for size.
-  ) +
-  theme_light() +             # Use a simpler theme.
+  theme_minimal() +             # Use a simpler theme.
   labs(                       # Make the titles nice.
     x = "Danceability",
     y = "Tempo",
     colour = "Time signature",
-    size = "Track duration"
+    size = ''
   )
-
+ggplotly(p = plot_2)
