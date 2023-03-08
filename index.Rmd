@@ -25,7 +25,7 @@ corpus <-
 
 ```
 
-### Deliverance
+### Songs with Weird Structures (1/2)
 
 ![](deliv.png)
 
@@ -38,7 +38,7 @@ src="https://open.spotify.com/embed/track/4siXNiLG9VJR6Z2kP6fFjv?" width="100%" 
 
 The song "Deliverance" by Opeth is part of the progressive death metal subgenre, which explains its peculiar structure. As visible in the cepstrogram the timbre changes at around a minute and 10 seconds in, when the vocalist starts singing instead of his usual beastly growling and more importantly the guitar tone changes from heavily distorted to clean. At roughly 5 minutes into the song, the clean singing starts again, however this part does feature a distorted guitar, so this is not visible in the cepstrogram. The self-similarity matrices highlight the same clean part as an outlier, and both show a highlight at around 10 minutes in at the introduction of the outro riff.
 
-### Paranoid Android
+### Songs with Weird Structures (2/2)
 
 ![](paranoid.png)
 
@@ -172,7 +172,7 @@ ggplotly(p = plot_2)
 
 From these variables it's hard to make a clear distinction between genres, as both seem to follow a similar distribution. Rock music's danceability seems to be slightly higher on average, but the tempo of the songs in both genres varies widely.\
 
-### "To Sirius" by Gojira
+### Songs with Low Valence (1/2)
 ```{r tosir}
 to_sirius <-
   get_tidy_audio_analysis("1BcuFfskHNf1WvqpyCs4wT?si=188253483ba54d55") |>
@@ -202,9 +202,9 @@ ggplotly(p=plot_3)
 <iframe style="border-radius:20px"
 src="https://open.spotify.com/embed/track/1BcuFfskHNf1WvqpyCs4wT?si=188253483ba54d55" width="100%" height="152" frameBorder="0" allowtransparency="true" allow="encrypted-media" data-external="1"></iframe>
 ```
-"To Sirius" by Gojira has the lowest valence of not only the metal part of the corpus, but of the corpus in its entirety. It also happens to have the highest energy of the entire corpus. The chromagram makes that pretty clear, by being almost entirely incomprehensible. The only pitch class which seems to be prevalent is the F. The parts at around 140 seconds and at 200 seconds stand out, as there are no real pitch classes that seem to be prevalent at all. In these parts the singing and the instrumental change a bit from the rest of the song, the singing making way for a low grunt and the palm muted guitars allow the drums to rise to the center of attention, muddling the chromagram.  
+This song has the lowest valence of not only the metal part of the corpus, but of the corpus in its entirety. It also happens to have the highest energy of the entire corpus. The chromagram makes that pretty clear, by being almost entirely incomprehensible. The only pitch class which seems to be prevalent is the F. The parts at around 140 seconds and at 200 seconds stand out, as there are no real pitch classes that seem to be prevalent at all. In these parts the singing and the instrumental change a bit from the rest of the song, the singing making way for a low grunt and the palm muted guitars allow the drums to rise to the center of attention, muddling the chromagram.  
 
-### "Creep" by Radiohead
+### Songs with Low Valence (2/2)
 ```{r creep}
 creep <-
   get_tidy_audio_analysis("70LcF31zb1H0PyJoS1Sx1r?si=b7cfbb858fd645ac") |>
