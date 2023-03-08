@@ -10,8 +10,8 @@ corpus <-
     rock |> mutate(genre = "Rock"),
     metal |> mutate(genre = "Metal")
   )
-pa <-
-  get_tidy_audio_analysis("6LgJvl0Xdtc73RJ1mmpotq?si=6101137f0de94f55") |> # Change URI.
+deliv <-
+  get_tidy_audio_analysis("4siXNiLG9VJR6Z2kP6fFjv?si=f2a0dc8cf3eb4957") |> # Change URI.
   compmus_align(beats, segments) |>                     # Change `bars`
   select(beats) |>                                      #   in all three
   unnest(beats) |>                                      #   of these lines.
@@ -30,7 +30,7 @@ pa <-
       )
   )
 
-pa_plt <- pa |>
+del_plt <- deliv |>
   compmus_gather_timbre() |>
   ggplot(
     aes(
@@ -46,7 +46,7 @@ pa_plt <- pa |>
   theme_classic() +
   ggtitle("Cepstrogram")
 
-pa_timbre <- pa |>
+del_timbre <- deliv |>
   compmus_self_similarity(timbre, "cosine") |> 
   ggplot(
     aes(
@@ -65,7 +65,7 @@ pa_timbre <- pa |>
   ggtitle("Timbre-based SSM") 
 
 
-pa_chroma <- pa |>
+del_chroma <- deliv |>
   compmus_self_similarity(pitches, "cosine") |> 
   ggplot(
     aes(
@@ -83,4 +83,4 @@ pa_chroma <- pa |>
   labs(x = "", y = "")+
   ggtitle("Chroma-based SSM")
 
-ggarrange(pa_timbre, pa_chroma, pa_plt, ncol = 2, nrow = 2)
+ggarrange(del_timbre, del_chroma, del_plt, ncol = 2, nrow = 2)

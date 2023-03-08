@@ -24,176 +24,39 @@ corpus <-
   )
 
 ```
-Column {.tabset}
--------------------------------------
 
 ### Deliverance
-```{r cepstrogram}
-deliv <-
-  get_tidy_audio_analysis("4siXNiLG9VJR6Z2kP6fFjv?si=f2a0dc8cf3eb4957") |> # Change URI.
-  compmus_align(beats, segments) |>                     # Change `bars`
-  select(beats) |>                                      #   in all three
-  unnest(beats) |>                                      #   of these lines.
-  mutate(
-    pitches =
-      map(segments,
-          compmus_summarise, pitches,
-          method = "rms", norm = "euclidean"              # Change summary & norm.
-      )
-  ) |>
-  mutate(
-    timbre =
-      map(segments,
-          compmus_summarise, timbre,
-          method = "rms", norm = "euclidean"              # Change summary & norm.
-      )
-  )
 
-del_plt <- deliv |>
-  compmus_gather_timbre() |>
-  ggplot(
-    aes(
-      x = start + duration / 2,
-      width = duration,
-      y = basis,
-      fill = value
-    )
-  ) +
-  geom_tile() +
-  labs(x = "Time (s)", y = NULL, fill = "Magnitude") +
-  scale_fill_viridis_c() +                              
-  theme_classic() +
-  ggtitle("Cepstrogram")
-
-del_timbre <- deliv |>
-  compmus_self_similarity(timbre, "cosine") |> 
-  ggplot(
-    aes(
-      x = xstart + xduration / 2,
-      width = xduration,
-      y = ystart + yduration / 2,
-      height = yduration,
-      fill = d
-    )
-  ) +
-  geom_tile() +
-  coord_fixed() +
-  scale_fill_viridis_c(guide = "none") +
-  theme_classic() +
-  labs(x = "", y = "")+ 
-  ggtitle("Timbre-based SSM") 
-
-
-del_chroma <- deliv |>
-  compmus_self_similarity(pitches, "cosine") |> 
-  ggplot(
-    aes(
-      x = xstart + xduration / 2,
-      width = xduration,
-      y = ystart + yduration / 2,
-      height = yduration,
-      fill = d
-    )
-  ) +
-  geom_tile() +
-  coord_fixed() +
-  scale_fill_viridis_c(guide = "none") +
-  theme_classic() +
-  labs(x = "", y = "")+
-  ggtitle("Chroma-based SSM")
-
-ggarrange(del_timbre, del_chroma, del_plt, ncol = 2, nrow = 2)
-```
+![](deliv.png)
 
 ***
+
+```{=html}
+<iframe style="border-radius:20px"
+src="https://open.spotify.com/embed/track/4siXNiLG9VJR6Z2kP6fFjv?" width="100%" height="152" frameBorder="0" allowtransparency="true" allow="encrypted-media" data-external="1"></iframe>
+```
 
 The song "Deliverance" by Opeth is part of the progressive death metal subgenre, which explains its peculiar structure. As visible in the cepstrogram the timbre changes at around a minute and 10 seconds in, when the vocalist starts singing instead of his usual beastly growling and more importantly the guitar tone changes from heavily distorted to clean. At roughly 5 minutes into the song, the clean singing starts again, however this part does feature a distorted guitar, so this is not visible in the cepstrogram. The self-similarity matrices highlight the same clean part as an outlier, and both show a highlight at around 10 minutes in at the introduction of the outro riff.
 
 ### Paranoid Android
 
-```{r cepstrogram2}
-pa <-
-  get_tidy_audio_analysis("6LgJvl0Xdtc73RJ1mmpotq?si=6101137f0de94f55") |> # Change URI.
-  compmus_align(beats, segments) |>                     # Change `bars`
-  select(beats) |>                                      #   in all three
-  unnest(beats) |>                                      #   of these lines.
-  mutate(
-    pitches =
-      map(segments,
-          compmus_summarise, pitches,
-          method = "rms", norm = "euclidean"              # Change summary & norm.
-      )
-  ) |>
-  mutate(
-    timbre =
-      map(segments,
-          compmus_summarise, timbre,
-          method = "rms", norm = "euclidean"              # Change summary & norm.
-      )
-  )
-
-pa_plt <- pa |>
-  compmus_gather_timbre() |>
-  ggplot(
-    aes(
-      x = start + duration / 2,
-      width = duration,
-      y = basis,
-      fill = value
-    )
-  ) +
-  geom_tile() +
-  labs(x = "Time (s)", y = NULL, fill = "Magnitude") +
-  scale_fill_viridis_c() +                              
-  theme_classic() +
-  ggtitle("Cepstrogram")
-
-pa_timbre <- pa |>
-  compmus_self_similarity(timbre, "cosine") |> 
-  ggplot(
-    aes(
-      x = xstart + xduration / 2,
-      width = xduration,
-      y = ystart + yduration / 2,
-      height = yduration,
-      fill = d
-    )
-  ) +
-  geom_tile() +
-  coord_fixed() +
-  scale_fill_viridis_c(guide = "none") +
-  theme_classic() +
-  labs(x = "", y = "")+ 
-  ggtitle("Timbre-based SSM") 
-
-
-pa_chroma <- pa |>
-  compmus_self_similarity(pitches, "cosine") |> 
-  ggplot(
-    aes(
-      x = xstart + xduration / 2,
-      width = xduration,
-      y = ystart + yduration / 2,
-      height = yduration,
-      fill = d
-    )
-  ) +
-  geom_tile() +
-  coord_fixed() +
-  scale_fill_viridis_c(guide = "none") +
-  theme_classic() +
-  labs(x = "", y = "")+
-  ggtitle("Chroma-based SSM")
-
-ggarrange(pa_timbre, pa_chroma, pa_plt, ncol = 2, nrow = 2)
-```
+![](paranoid.png)
 
 ***
 
+```{=html}
+<iframe style="border-radius:20px"
+src="https://open.spotify.com/embed/track/6LgJvl0Xdtc73RJ1mmpotq?si=cb296db6ab774280" width="100%" height="152" frameBorder="0" allowtransparency="true" allow="encrypted-media" data-external="1"></iframe>
+```
+
 Another song in my corpus with an interesting structure is "Paranoid Android" by Radiohead. However where "Deliverance" has a clear standout moment, this song consists of three audibly different parts: the intro, the aggressive part and the "rain down" part (from around 3:35 to around 6:10). These different parts aren't clearly visible in the chroma based SSM unfortunately, as it shows so many significant changes it becomes a bit messy. These changes are visible in the cepstrogram and the timbre based SSM, however. This may have something to do with the fact the the song stays in the same key, but the instrumentation varies from an acoustic guitar in the intro and the "rain down" part to distorted guitars in the aggressive parts.
 
-### Introducing my taste in music
-[Link to my corpus playlist](https://open.spotify.com/playlist/09ybINQumucmE0BMdYakx2?si=4e120648fadf491b)\
+### Introducing My Taste in Music
+```{=html}
+<iframe style="border-radius:20px"
+src="https://open.spotify.com/embed/playlist/09ybINQumucmE0BMdYakx2?" width="100%" height="152" frameBorder="0" allowtransparency="true" allow="encrypted-media" data-external="1"></iframe>
+```
+
 I have chosen 10 bands, 5 of which are not considered metal bands and 5 of which are considered metal bands. My goal is to see how easily distinguishable these genres actually are if we looked at the Spotify statistics.\
 
 #### Band selection
@@ -212,7 +75,7 @@ Led Zeppelin - 'Immigrant Song'; Considered "proto-metal", influential on the ge
 Opeth - 'The Leper Affinity'; Good example of Opeth's dynamics.\
 TOOL - 'Bottom' and 'Ticks & Leeches'; Both songs have very quiet build-up parts in the middle.\
 
-### Is metal that much angrier?
+### Is Metal that Much Angrier?
 ```{r valen}
 plot_1 <- corpus |>                    # Start with corpus.
   mutate(
@@ -262,7 +125,7 @@ ggplotly(p = plot_1)
 By looking at this plot it's very clear to see that the songs in the metal part of the playlist are a lot more clustered toward high energy and low valence. The rock songs seem to be a lot more scattered, which could be explained by the variety of rock subgenres in that part of the playlist.\
 
 
-### What about rhythm?
+### What about Rhythm?
 ```{r dance}
 plot_2 <- corpus |>                    # Start with corpus.
   mutate(
@@ -335,6 +198,10 @@ ggplotly(p=plot_3)
 ```
 
 ***
+```{=html}
+<iframe style="border-radius:20px"
+src="https://open.spotify.com/embed/track/1BcuFfskHNf1WvqpyCs4wT?si=188253483ba54d55" width="100%" height="152" frameBorder="0" allowtransparency="true" allow="encrypted-media" data-external="1"></iframe>
+```
 "To Sirius" by Gojira has the lowest valence of not only the metal part of the corpus, but of the corpus in its entirety. It also happens to have the highest energy of the entire corpus. The chromagram makes that pretty clear, by being almost entirely incomprehensible. The only pitch class which seems to be prevalent is the F. The parts at around 140 seconds and at 200 seconds stand out, as there are no real pitch classes that seem to be prevalent at all. In these parts the singing and the instrumental change a bit from the rest of the song, the singing making way for a low grunt and the palm muted guitars allow the drums to rise to the center of attention, muddling the chromagram.  
 
 ### "Creep" by Radiohead
@@ -363,4 +230,9 @@ ggplotly(p = plot_4)
 ```
 
 ***
+
+```{=html}
+<iframe style="border-radius:20px"
+src="https://open.spotify.com/embed/track/70LcF31zb1H0PyJoS1Sx1r?si=b7cfbb858fd645ac" width="100%" height="152" frameBorder="0" allowtransparency="true" allow="encrypted-media" data-external="1"></iframe>
+```
 "Creep" by Radiohead scores lowest on valence in the non-metal half of the corpus and the song scores a lot lower on energy than "To Sirius" on the previous page. Here the chord progression is a lot easier to read, as the G, B and C are the pitch classes with the highest magnitude.
