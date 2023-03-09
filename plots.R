@@ -3,11 +3,33 @@ library(spotifyr)
 library(plotly)
 metal <- get_playlist_audio_features("", "4jOlWW7XLRli6rjThfqlVl?si=781f9fafb8574da1")
 rock <- get_playlist_audio_features("", "43rPmb2v9YWmbotTymQLQE?si=fd6f70a6a61045a3")
+
+metal_stats <- metal |> 
+  summarise(
+    mean_valence = mean(metal$valence),
+    mean_energy = mean(metal$energy),
+    mean_dance = mean(metal$danceability),
+    mean_tempo = mean(metal$tempo)
+    )
+rock_stats <- rock |> 
+  summarise(
+    mean_valence = mean(rock$valence),
+    mean_energy = mean(rock$energy),
+    mean_dance = mean(rock$danceability),
+    mean_tempo = mean(rock$tempo)
+    )
+
+corp_stats <-
+  bind_rows(
+    rock_stats |> mutate(genre = "Rock"),
+    metal_stats |> mutate(genre = "Metal")
+)
 corpus <-
   bind_rows(
     rock |> mutate(genre = "Rock"),
     metal |> mutate(genre = "Metal")
   )
+
 plot_1 <- corpus |>                    # Start with corpus.
   mutate(
     mode = ifelse(mode == 0, "Minor", "Major"),
@@ -24,7 +46,8 @@ plot_1 <- corpus |>                    # Start with corpus.
   ) +
   geom_point() +              # Scatter plot.
   geom_rug(linewidth = 0.1) + # Add 'fringes' to show data distribution.
-
+  geom_vline(aes(xintercept = mean_valence), corp_stats, color = "purple", linewidth = 0.2, show.legend = TRUE) +
+  geom_hline(aes(yintercept = mean_energy), corp_stats, color = "purple", linewidth = 0.2, show.legend = TRUE) +
   facet_wrap(~ genre) +    # Separate charts per playlist.
   scale_x_continuous(         # Fine-tune the x axis.
     limits = c(0, 1),
@@ -50,6 +73,7 @@ plot_1 <- corpus |>                    # Start with corpus.
     y = "Energy",
     colour = "Mode"
   )
+
 ggplotly(p = plot_1)
 
 plot_2 <- corpus |>                    # Start with corpus.
@@ -69,6 +93,8 @@ plot_2 <- corpus |>                    # Start with corpus.
   ) +
   geom_point() +              # Scatter plot.
   geom_rug(linewidth = 0.1) + # Add 'fringes' to show data distribution.
+  geom_vline(aes(xintercept = mean_dance), corp_stats, color = "purple", linewidth = 0.2, show.legend = TRUE) +
+  geom_hline(aes(yintercept = mean_tempo), corp_stats, color = "purple", linewidth = 0.2, show.legend = TRUE) +
   facet_wrap(~ genre) +    # Separate charts per playlist.
   scale_x_continuous(         # Fine-tune the x axis.
     limits = c(0, 1),

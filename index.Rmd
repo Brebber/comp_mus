@@ -22,36 +22,137 @@ corpus <-
     rock |> mutate(genre = "Rock"),
     metal |> mutate(genre = "Metal")
   )
+metal_stats <- metal |> 
+  summarise(
+    mean_valence = mean(metal$valence),
+    mean_energy = mean(metal$energy),
+    mean_dance = mean(metal$danceability),
+    mean_tempo = mean(metal$tempo)
+    )
+rock_stats <- rock |> 
+  summarise(
+    mean_valence = mean(rock$valence),
+    mean_energy = mean(rock$energy),
+    mean_dance = mean(rock$danceability),
+    mean_tempo = mean(rock$tempo)
+    )
 
+corp_stats <-
+  bind_rows(
+    rock_stats |> mutate(genre = "Rock"),
+    metal_stats |> mutate(genre = "Metal")
+)
+
+circshift <- function(v, n) {
+  if (n == 0) v else c(tail(v, n), head(v, -n))
+}
+
+#      C     C#    D     Eb    E     F     F#    G     Ab    A     Bb    B
+major_chord <-
+  c(   1,    0,    0,    0,    1,    0,    0,    1,    0,    0,    0,    0)
+minor_chord <-
+  c(   1,    0,    0,    1,    0,    0,    0,    1,    0,    0,    0,    0)
+seventh_chord <-
+  c(   1,    0,    0,    0,    1,    0,    0,    1,    0,    0,    1,    0)
+
+major_key <-
+  c(6.35, 2.23, 3.48, 2.33, 4.38, 4.09, 2.52, 5.19, 2.39, 3.66, 2.29, 2.88)
+minor_key <-
+  c(6.33, 2.68, 3.52, 5.38, 2.60, 3.53, 2.54, 4.75, 3.98, 2.69, 3.34, 3.17)
+
+chord_templates <-
+  tribble(
+    ~name, ~template,
+    "Gb:7", circshift(seventh_chord, 6),
+    "Gb:maj", circshift(major_chord, 6),
+    "Bb:min", circshift(minor_chord, 10),
+    "Db:maj", circshift(major_chord, 1),
+    "F:min", circshift(minor_chord, 5),
+    "Ab:7", circshift(seventh_chord, 8),
+    "Ab:maj", circshift(major_chord, 8),
+    "C:min", circshift(minor_chord, 0),
+    "Eb:7", circshift(seventh_chord, 3),
+    "Eb:maj", circshift(major_chord, 3),
+    "G:min", circshift(minor_chord, 7),
+    "Bb:7", circshift(seventh_chord, 10),
+    "Bb:maj", circshift(major_chord, 10),
+    "D:min", circshift(minor_chord, 2),
+    "F:7", circshift(seventh_chord, 5),
+    "F:maj", circshift(major_chord, 5),
+    "A:min", circshift(minor_chord, 9),
+    "C:7", circshift(seventh_chord, 0),
+    "C:maj", circshift(major_chord, 0),
+    "E:min", circshift(minor_chord, 4),
+    "G:7", circshift(seventh_chord, 7),
+    "G:maj", circshift(major_chord, 7),
+    "B:min", circshift(minor_chord, 11),
+    "D:7", circshift(seventh_chord, 2),
+    "D:maj", circshift(major_chord, 2),
+    "F#:min", circshift(minor_chord, 6),
+    "A:7", circshift(seventh_chord, 9),
+    "A:maj", circshift(major_chord, 9),
+    "C#:min", circshift(minor_chord, 1),
+    "E:7", circshift(seventh_chord, 4),
+    "E:maj", circshift(major_chord, 4),
+    "G#:min", circshift(minor_chord, 8),
+    "B:7", circshift(seventh_chord, 11),
+    "B:maj", circshift(major_chord, 11),
+    "D#:min", circshift(minor_chord, 3)
+  )
+
+key_templates <-
+  tribble(
+    ~name, ~template,
+    "Gb:maj", circshift(major_key, 6),
+    "Bb:min", circshift(minor_key, 10),
+    "Db:maj", circshift(major_key, 1),
+    "F:min", circshift(minor_key, 5),
+    "Ab:maj", circshift(major_key, 8),
+    "C:min", circshift(minor_key, 0),
+    "Eb:maj", circshift(major_key, 3),
+    "G:min", circshift(minor_key, 7),
+    "Bb:maj", circshift(major_key, 10),
+    "D:min", circshift(minor_key, 2),
+    "F:maj", circshift(major_key, 5),
+    "A:min", circshift(minor_key, 9),
+    "C:maj", circshift(major_key, 0),
+    "E:min", circshift(minor_key, 4),
+    "G:maj", circshift(major_key, 7),
+    "B:min", circshift(minor_key, 11),
+    "D:maj", circshift(major_key, 2),
+    "F#:min", circshift(minor_key, 6),
+    "A:maj", circshift(major_key, 9),
+    "C#:min", circshift(minor_key, 1),
+    "E:maj", circshift(major_key, 4),
+    "G#:min", circshift(minor_key, 8),
+    "B:maj", circshift(major_key, 11),
+    "D#:min", circshift(minor_key, 3)
+  )
 ```
+### Common Keys 
+```{r hist}
 
-### Songs with Weird Structures (1/2)
+hist <-  
+  ggplot(corpus, aes(x=key_mode)) + 
+  geom_histogram(stat="count", binwidth = 1, color = 'black', fill = 'red') +
+  facet_wrap(~ genre) + 
+  scale_colour_brewer(        # Use the Color Brewer to choose a palette.
+    type = "qual",            # Qualitative set.
+    palette = "Set1"        # Name of the palette is 'Paired'.
+  ) +  
+  theme_minimal()+
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1),
+        axis.title.x = element_blank(),
+        axis.title.y = element_blank()
+        )
 
-![](deliv.png)
-
+ggplotly(p=hist)
+```
 ***
-
-```{=html}
-<iframe style="border-radius:20px"
-src="https://open.spotify.com/embed/track/4siXNiLG9VJR6Z2kP6fFjv?" width="100%" height="152" frameBorder="0" allowtransparency="true" allow="encrypted-media" data-external="1"></iframe>
-```
-
-The song "Deliverance" by Opeth is part of the progressive death metal subgenre, which explains its peculiar structure. As visible in the cepstrogram the timbre changes at around a minute and 10 seconds in, when the vocalist starts singing instead of his usual beastly growling and more importantly the guitar tone changes from heavily distorted to clean. At roughly 5 minutes into the song, the clean singing starts again, however this part does feature a distorted guitar, so this is not visible in the cepstrogram. The self-similarity matrices highlight the same clean part as an outlier, and both show a highlight at around 10 minutes in at the introduction of the outro riff.
-
-### Songs with Weird Structures (2/2)
-
-![](paranoid.png)
-
-***
-
-```{=html}
-<iframe style="border-radius:20px"
-src="https://open.spotify.com/embed/track/6LgJvl0Xdtc73RJ1mmpotq?si=cb296db6ab774280" width="100%" height="152" frameBorder="0" allowtransparency="true" allow="encrypted-media" data-external="1"></iframe>
-```
-
-Another song in my corpus with an interesting structure is "Paranoid Android" by Radiohead. However where "Deliverance" has a clear standout moment, this song consists of three audibly different parts: the intro, the aggressive part and the "rain down" part (from around 3:35 to around 6:10). These different parts aren't clearly visible in the chroma based SSM unfortunately, as it shows so many significant changes it becomes a bit messy. These changes are visible in the cepstrogram and the timbre based SSM, however. This may have something to do with the fact the the song stays in the same key, but the instrumentation varies from an acoustic guitar in the intro and the "rain down" part to distorted guitars in the aggressive parts.
+For every existent key, there is at least one song in the rock playlist that uses it, this is not the case for the metal playlist however. The popularity of Em among metal tracks is unsurprising, as the key represents [grief, mournfulness and restlessness of spirit](https://interlude.hk/feel-key-e-minor/#:~:text=Pauer's%20key%20characteristics%20for%20E,of%20pieces%20in%20E%20minor.). For the rock playlist there is not really a key that stands out as much.
 
 ### Introducing My Taste in Music
+
 ```{=html}
 <iframe style="border-radius:20px"
 src="https://open.spotify.com/embed/playlist/09ybINQumucmE0BMdYakx2?" width="100%" height="152" frameBorder="0" allowtransparency="true" allow="encrypted-media" data-external="1"></iframe>
@@ -73,7 +174,7 @@ Queens of the Stone Age - 'My God is the Sun'; Heavy non-metal song.\
 Radiohead - 'Paranoid Android'; Alternates between soft rock parts and chaotic loud solos.\
 Led Zeppelin - 'Immigrant Song'; Considered "proto-metal", influential on the genre.\
 Opeth - 'The Leper Affinity'; Good example of Opeth's dynamics.\
-TOOL - 'Bottom' and 'Ticks & Leeches'; Both songs have very quiet build-up parts in the middle.\
+TOOL - 'Bottom' and 'Ticks & Leeches'; Both songs have very quiet build-up parts in the middle.
 
 ### Is Metal that Much Angrier?
 ```{r valen}
@@ -93,6 +194,9 @@ plot_1 <- corpus |>                    # Start with corpus.
   ) +
   geom_point() +              # Scatter plot.
   geom_rug(linewidth = 0.1) + # Add 'fringes' to show data distribution.
+
+    geom_vline(aes(xintercept = mean_valence), corp_stats, color = "purple", linewidth = 0.2, show.legend = TRUE) +
+  geom_hline(aes(yintercept = mean_energy), corp_stats, color = "purple", linewidth = 0.2, show.legend = TRUE) +
 
   facet_wrap(~ genre) +    # Separate charts per playlist.
   scale_x_continuous(         # Fine-tune the x axis.
@@ -122,10 +226,11 @@ plot_1 <- corpus |>                    # Start with corpus.
 ggplotly(p = plot_1)
 ```
 ***
-By looking at this plot it's very clear to see that the songs in the metal part of the playlist are a lot more clustered toward high energy and low valence. The rock songs seem to be a lot more scattered, which could be explained by the variety of rock subgenres in that part of the playlist.\
+
+By looking at this plot it's very clear to see that the songs in the metal part of the playlist are a lot more clustered toward high energy and low valence. The rock songs seem to be a lot more scattered, which could be explained by the variety of rock subgenres in that part of the playlist. The purple lines represent the means of both variables in both playlists and show a that metal tends to have a lower valence and a higher energy. So yes, metal is angrier (on average at least).\
 
 
-### What about Rhythm?
+### More Aggressive = Faster?
 ```{r dance}
 plot_2 <- corpus |>                    # Start with corpus.
   mutate(
@@ -144,6 +249,8 @@ plot_2 <- corpus |>                    # Start with corpus.
   ) +
   geom_point() +              # Scatter plot.
   geom_rug(linewidth = 0.1) + # Add 'fringes' to show data distribution.
+  geom_vline(aes(xintercept = mean_dance), corp_stats, color = "purple", linewidth = 0.2, show.legend = TRUE) +
+  geom_hline(aes(yintercept = mean_tempo), corp_stats, color = "purple", linewidth = 0.2, show.legend = TRUE) +
   facet_wrap(~ genre) +    # Separate charts per playlist.
   scale_x_continuous(         # Fine-tune the x axis.
     limits = c(0, 1),
@@ -170,7 +277,7 @@ ggplotly(p = plot_2)
 ```
 ***
 
-From these variables it's hard to make a clear distinction between genres, as both seem to follow a similar distribution. Rock music's danceability seems to be slightly higher on average, but the tempo of the songs in both genres varies widely.\
+Contrary to my expectations, the mean tempo of the metal playlist is actually slightly lower than the mean tempo of the rock playlist.\
 
 ### Songs with Low Valence (1/2)
 ```{r tosir}
@@ -236,3 +343,29 @@ ggplotly(p = plot_4)
 src="https://open.spotify.com/embed/track/70LcF31zb1H0PyJoS1Sx1r?si=b7cfbb858fd645ac" width="100%" height="152" frameBorder="0" allowtransparency="true" allow="encrypted-media" data-external="1"></iframe>
 ```
 "Creep" by Radiohead scores lowest on valence in the non-metal half of the corpus and the song scores a lot lower on energy than "To Sirius" on the previous page. Here the chord progression is a lot easier to read, as the G, B and C are the pitch classes with the highest magnitude.
+
+### Songs with Weird Structures (1/2)
+
+![](deliv.png)
+
+***
+
+```{=html}
+<iframe style="border-radius:20px"
+src="https://open.spotify.com/embed/track/4siXNiLG9VJR6Z2kP6fFjv?" width="100%" height="152" frameBorder="0" allowtransparency="true" allow="encrypted-media" data-external="1"></iframe>
+```
+
+The song "Deliverance" by Opeth is part of the progressive death metal subgenre, which explains its peculiar structure. As visible in the cepstrogram the timbre changes at around a minute and 10 seconds in, when the vocalist starts singing instead of his usual beastly growling and more importantly the guitar tone changes from heavily distorted to clean. At roughly 5 minutes into the song, the clean singing starts again, however this part does feature a distorted guitar, so this is not visible in the cepstrogram. The self-similarity matrices highlight the same clean part as an outlier, and both show a highlight at around 10 minutes in at the introduction of the outro riff.
+
+### Songs with Weird Structures (2/2)
+
+![](paranoid.png)
+
+***
+
+```{=html}
+<iframe style="border-radius:20px"
+src="https://open.spotify.com/embed/track/6LgJvl0Xdtc73RJ1mmpotq?si=cb296db6ab774280" width="100%" height="152" frameBorder="0" allowtransparency="true" allow="encrypted-media" data-external="1"></iframe>
+```
+
+Another song in my corpus with an interesting structure is "Paranoid Android" by Radiohead. However where "Deliverance" has a clear standout moment, this song consists of three audibly different parts: the intro, the aggressive part and the "rain down" part (from around 3:35 to around 6:10). These different parts aren't clearly visible in the chroma based SSM unfortunately, as it shows so many significant changes it becomes a bit messy. These changes are visible in the cepstrogram and the timbre based SSM, however. This may have something to do with the fact the the song stays in the same key, but the instrumentation varies from an acoustic guitar in the intro and the "rain down" part to distorted guitars in the aggressive parts.
