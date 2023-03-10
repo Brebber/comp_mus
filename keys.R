@@ -183,3 +183,32 @@ l_keygram <- lotus |>
   ggtitle("Keygram")
 l_keygram
 
+creep <-
+  get_tidy_audio_analysis("70LcF31zb1H0PyJoS1Sx1r?si=b753ddf24d3e430f") |>
+  compmus_align(bars, segments) |>
+  select(bars) |>
+  unnest(bars) |>
+  mutate(
+    pitches =
+      map(segments,
+          compmus_summarise, pitches,
+          method = "mean", norm = "manhattan"
+      )
+  )
+
+c_keygram <- creep |> 
+  compmus_match_pitch_template(
+    chord_templates,         # Change to chord_templates if descired
+    method = "euclidean",  # Try different distance metrics
+    norm = "manhattan"     # Try different norms
+  ) |>
+  ggplot(
+    aes(x = start + duration / 2, width = duration, y = name, fill = d)
+  ) +
+  geom_tile() +
+  scale_fill_viridis_c(guide = "none") +
+  theme_minimal() +
+  labs(x = "Time (s)", y = "") +
+  ggtitle("Chordogram")
+c_keygram
+

@@ -135,11 +135,7 @@ key_templates <-
 hist <-  
   ggplot(corpus, aes(x=key_mode)) + 
   geom_histogram(stat="count", binwidth = 1, color = 'black', fill = 'red') +
-  facet_wrap(~ genre) + 
-  scale_colour_brewer(        # Use the Color Brewer to choose a palette.
-    type = "qual",            # Qualitative set.
-    palette = "Set1"        # Name of the palette is 'Paired'.
-  ) +  
+  facet_wrap(~ genre) +
   theme_minimal()+
   theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1),
         axis.title.x = element_blank(),
@@ -149,7 +145,164 @@ hist <-
 ggplotly(p=hist)
 ```
 ***
-For every existent key, there is at least one song in the rock playlist that uses it, this is not the case for the metal playlist however. The popularity of Em among metal tracks is unsurprising, as the key represents [grief, mournfulness and restlessness of spirit](https://interlude.hk/feel-key-e-minor/#:~:text=Pauer's%20key%20characteristics%20for%20E,of%20pieces%20in%20E%20minor.). For the rock playlist there is not really a key that stands out as much.
+For every existent key, there is at least one song in the Rock playlist that uses it, this is not the case for the Metal playlist however. The popularity of Em among Metal tracks is unsurprising, as the key represents [grief, mournfulness and restlessness of spirit](https://interlude.hk/feel-key-e-minor/#:~:text=Pauer's%20key%20characteristics%20for%20E,of%20pieces%20in%20E%20minor.). For the Rock playlist there is not really a key that stands out as much.
+
+### Songs with Low Valence (3/3)
+
+```{r creep2}
+creep <-
+  get_tidy_audio_analysis("70LcF31zb1H0PyJoS1Sx1r?si=b753ddf24d3e430f") |>
+  compmus_align(bars, segments) |>
+  select(bars) |>
+  unnest(bars) |>
+  mutate(
+    pitches =
+      map(segments,
+          compmus_summarise, pitches,
+          method = "mean", norm = "manhattan"
+      )
+  )
+
+c_chordogram <- creep |> 
+  compmus_match_pitch_template(
+    chord_templates,         # Change to chord_templates if descired
+    method = "euclidean",  # Try different distance metrics
+    norm = "manhattan"     # Try different norms
+  ) |>
+  ggplot(
+    aes(x = start + duration / 2, width = duration, y = name, fill = d)
+  ) +
+  geom_tile() +
+  scale_fill_viridis_c(guide = "none") +
+  theme_minimal() +
+  labs(x = "Time (s)", y = "") +
+  ggtitle("Chordogram")
+ggplotly(p=c_chordogram)
+```
+***
+(I'm not sure if I'm keeping this as a separate page or if I'm swapping this with the chromagram for Creep, as this is basically the same information.)\
+As "Creep" has an interesting but simple chord progression, it's chordogram is clear. The four chords constantly looping are G, B, C and Cm and those are the only four chords in the song.
+
+### Back to Keys (1/3)
+```{r stwy}
+stairway <-
+  get_tidy_audio_analysis("5CQ30WqJwcep0pYcV4AMNc?si=682bdf162f4c4dcd") |>
+  compmus_align(sections, segments) |>
+  select(sections) |>
+  unnest(sections) |>
+  mutate(
+    pitches =
+      map(segments,
+          compmus_summarise, pitches,
+          method = "mean", norm = "manhattan"
+      )
+  )
+
+s_keygram <- stairway |> 
+  compmus_match_pitch_template(
+    key_templates,         # Change to chord_templates if descired
+    method = "euclidean",  # Try different distance metrics
+    norm = "manhattan"     # Try different norms
+  ) |>
+  ggplot(
+    aes(x = start + duration / 2, width = duration, y = name, fill = d)
+  ) +
+  geom_tile() +
+  scale_fill_viridis_c(guide = "none") +
+  theme_minimal() +
+  labs(x = "Time (s)", y = "") +
+  ggtitle("Keygram")
+ggplotly(p=s_keygram)
+```
+
+***
+```{=html}
+<iframe style="border-radius:20px"
+src="https://open.spotify.com/embed/track/5CQ30WqJwcep0pYcV4AMNc?si=682bdf162f4c4dcd" width="100%" height="152" frameBorder="0" allowtransparency="true" allow="encrypted-media" data-external="1"></iframe>
+```
+
+A bit of a cliche, sure. 
+
+### Back to Keys (2/3)
+
+```{r mop}
+master <-
+  get_tidy_audio_analysis("2MuWTIM3b0YEAskbeeFE1i?si=f1b442b834af43b4") |>
+  compmus_align(sections, segments) |>
+  select(sections) |>
+  unnest(sections) |>
+  mutate(
+    pitches =
+      map(segments,
+          compmus_summarise, pitches,
+          method = "mean", norm = "manhattan"
+      )
+  )
+
+m_keygram <- master |> 
+  compmus_match_pitch_template(
+    key_templates,         # Change to chord_templates if descired
+    method = "euclidean",  # Try different distance metrics
+    norm = "manhattan"     # Try different norms
+  ) |>
+  ggplot(
+    aes(x = start + duration / 2, width = duration, y = name, fill = d)
+  ) +
+  geom_tile() +
+  scale_fill_viridis_c(guide = "none") +
+  theme_minimal() +
+  labs(x = "Time (s)", y = "") +
+  ggtitle("Keygram")
+ggplotly(p=m_keygram)
+```
+
+***
+```{=html}
+<iframe style="border-radius:20px"
+src="https://open.spotify.com/embed/track/2MuWTIM3b0YEAskbeeFE1i?si=f1b442b834af43b4" width="100%" height="152" frameBorder="0" allowtransparency="true" allow="encrypted-media" data-external="1"></iframe>
+```
+
+Em
+
+### Back to Keys (3/3)
+```{r lot}
+lotus <-
+  get_tidy_audio_analysis("2ka0Oum3mNMGGXL9gBqdkq?si=d0cc5f6e3df641ba") |>
+  compmus_align(sections, segments) |>
+  select(sections) |>
+  unnest(sections) |>
+  mutate(
+    pitches =
+      map(segments,
+          compmus_summarise, pitches,
+          method = "mean", norm = "manhattan"
+      )
+  )
+
+l_keygram <- lotus |> 
+  compmus_match_pitch_template(
+    key_templates,         # Change to chord_templates if descired
+    method = "euclidean",  # Try different distance metrics
+    norm = "manhattan"     # Try different norms
+  ) |>
+  ggplot(
+    aes(x = start + duration / 2, width = duration, y = name, fill = d)
+  ) +
+  geom_tile() +
+  scale_fill_viridis_c(guide = "none") +
+  theme_minimal() +
+  labs(x = "Time (s)", y = "") +
+  ggtitle("Keygram")
+ggplotly(p=l_keygram)
+```
+
+*** 
+```{=html}
+<iframe style="border-radius:20px"
+src="https://open.spotify.com/embed/track/2ka0Oum3mNMGGXL9gBqdkq?si=d0cc5f6e3df641ba" width="100%" height="152" frameBorder="0" allowtransparency="true" allow="encrypted-media" data-external="1"></iframe>
+```
+
+Unlike the previous two examples, it doesn't work for this song at all.
 
 ### Introducing My Taste in Music
 
@@ -158,21 +311,21 @@ For every existent key, there is at least one song in the rock playlist that use
 src="https://open.spotify.com/embed/playlist/09ybINQumucmE0BMdYakx2?" width="100%" height="152" frameBorder="0" allowtransparency="true" allow="encrypted-media" data-external="1"></iframe>
 ```
 
-I have chosen 10 bands, 5 of which are not considered metal bands and 5 of which are considered metal bands. My goal is to see how easily distinguishable these genres actually are if we looked at the Spotify statistics.\
+For this project I have chosen 10 bands, 5 of which are not considered Rock but not Metal bands and 5 of which are considered Metal bands. Metal is a subgenre of Rock that has a multitude of subgenres of itself. Metal is often faster, louder, more distorted and more extreme overall than Rock.  My goal is to see how easily distinguishable these genres actually are if we looked at the Spotify statistics.\
 
 #### Band selection
-The non-metal bands I picked are: Queens of the Stone Age, Radiohead, Queen, Led Zeppelin and Arctic Monkeys. \
-The metal bands I picked are: Metallica, Death, Gojira, Opeth and TOOL.\
-For both groups I tried to pick bands that sound as distinct as possible from eachother, however this list is definitely too limited to provide a complete overview of both genres. The non-metal bands I chose are varied enough but still don't provide an overview of the genre in its entirety and 3 of the 5 metal bands I chose fall into different categories of the death metal subgenre.\
+The Rock bands I picked are: Queens of the Stone Age, Radiohead, Queen, Led Zeppelin and Arctic Monkeys. \
+The Metal bands I picked are: Metallica, Death, Gojira, Opeth and TOOL.\
+For both groups I tried to pick bands that sound as distinct as possible from eachother, however this list is definitely too limited to provide a complete overview of both genres. The non-Metal bands I chose are varied enough but still don't provide an overview of the genre in its entirety and 3 of the 5 metal bands I chose fall into different categories of the Death Metal subgenre.\
 
 #### Song selection
-For the rock songs I mainly focused on somewhat high tempo guitar based music, to make the distinction between metal and rock as hard as possible. Some Queen and Radiohead songs are obvious exceptions to this, however I feel these are still interesting to analyse as they often have shifting dynamics, or they can provide a baseline to define a non-metal rock song. Queens of the Stone Age is the non-metal band that comes closest to being a metal band, but I decided not to include their actual metal songs. Led Zeppelin is often credited for at least partially inspiring the metal genre.\
-For the metal songs I picked songs that are unmistakably metal. Metallica is an obvious inclusion, however I only added songs from their thrash metal era. Death and Gojira fit the bill as well.\
+For the rock songs I mainly focused on somewhat high tempo guitar based music, to make the distinction between Metal and Rock as hard as possible. Some Queen and Radiohead songs are obvious exceptions to this, however I feel these are still interesting to analyse as they often have shifting dynamics, or they can provide a baseline to define a non-Metal Rock song. Queens of the Stone Age is the non-Metal band that comes closest to being a Metal band, but I decided not to include their actual Metal songs. Led Zeppelin is often credited for at least partially inspiring the Metal genre.\
+For the Metal playlist I picked songs that are unmistakably Metal. Metallica is an obvious inclusion, however I only added songs from their early Thrash Metal days. Death and Gojira fit the bill as well.\
 
 #### Outliers
-Queens of the Stone Age - 'My God is the Sun'; Heavy non-metal song.\
-Radiohead - 'Paranoid Android'; Alternates between soft rock parts and chaotic loud solos.\
-Led Zeppelin - 'Immigrant Song'; Considered "proto-metal", influential on the genre.\
+Queens of the Stone Age - 'My God is the Sun'; Heavy non-Metal song.\
+Radiohead - 'Paranoid Android'; Alternates between soft Rock parts and chaotic loud solos.\
+Led Zeppelin - 'Immigrant Song'; Considered "Proto-Metal", influential on the genre.\
 Opeth - 'The Leper Affinity'; Good example of Opeth's dynamics.\
 TOOL - 'Bottom' and 'Ticks & Leeches'; Both songs have very quiet build-up parts in the middle.
 
@@ -227,7 +380,7 @@ ggplotly(p = plot_1)
 ```
 ***
 
-By looking at this plot it's very clear to see that the songs in the metal part of the playlist are a lot more clustered toward high energy and low valence. The rock songs seem to be a lot more scattered, which could be explained by the variety of rock subgenres in that part of the playlist. The purple lines represent the means of both variables in both playlists and show a that metal tends to have a lower valence and a higher energy. So yes, metal is angrier (on average at least).\
+By looking at this plot it's obvious that the songs in the Metal part of the playlist are a lot more clustered toward high energy and low valence. The Rock songs seem to be a lot more scattered, which could be explained by the variety of Rock subgenres in that part of the playlist. The purple lines represent the means of both variables in both playlists and show a that Metal tends to have a lower valence and a higher energy. So yes, Metal is angrier (on average at least).\
 
 
 ### More Aggressive = Faster?
@@ -277,9 +430,9 @@ ggplotly(p = plot_2)
 ```
 ***
 
-Contrary to my expectations, the mean tempo of the metal playlist is actually slightly lower than the mean tempo of the rock playlist.\
+Contrary to my expectations, the mean tempo of the Metal playlist is actually slightly lower than the mean tempo of the Rock playlist.\
 
-### Songs with Low Valence (1/2)
+### Songs with Low Valence (1/3)
 ```{r tosir}
 to_sirius <-
   get_tidy_audio_analysis("1BcuFfskHNf1WvqpyCs4wT?si=188253483ba54d55") |>
@@ -309,9 +462,9 @@ ggplotly(p=plot_3)
 <iframe style="border-radius:20px"
 src="https://open.spotify.com/embed/track/1BcuFfskHNf1WvqpyCs4wT?si=188253483ba54d55" width="100%" height="152" frameBorder="0" allowtransparency="true" allow="encrypted-media" data-external="1"></iframe>
 ```
-This song has the lowest valence of not only the metal part of the corpus, but of the corpus in its entirety. It also happens to have the highest energy of the entire corpus. The chromagram makes that pretty clear, by being almost entirely incomprehensible. The only pitch class which seems to be prevalent is the F. The parts at around 140 seconds and at 200 seconds stand out, as there are no real pitch classes that seem to be prevalent at all. In these parts the singing and the instrumental change a bit from the rest of the song, the singing making way for a low grunt and the palm muted guitars allow the drums to rise to the center of attention, muddling the chromagram.  
+This song has the lowest valence of not only the Metal part of the corpus, but of the corpus in its entirety. It also happens to have the highest energy of the entire corpus. The chromagram makes that pretty clear, by being almost entirely incomprehensible. The only pitch class which seems to be prevalent is the F. The parts at around 140 seconds and at 200 seconds stand out, as there are no real pitch classes that seem to be prevalent at all. In these parts the singing and the instrumental change a bit from the rest of the song, the singing making way for a low grunt and the palm muted guitars allow the drums to rise to the center of attention, muddling the chromagram.  
 
-### Songs with Low Valence (2/2)
+### Songs with Low Valence (2/3)
 ```{r creep}
 creep <-
   get_tidy_audio_analysis("70LcF31zb1H0PyJoS1Sx1r?si=b7cfbb858fd645ac") |>
@@ -342,7 +495,7 @@ ggplotly(p = plot_4)
 <iframe style="border-radius:20px"
 src="https://open.spotify.com/embed/track/70LcF31zb1H0PyJoS1Sx1r?si=b7cfbb858fd645ac" width="100%" height="152" frameBorder="0" allowtransparency="true" allow="encrypted-media" data-external="1"></iframe>
 ```
-"Creep" by Radiohead scores lowest on valence in the non-metal half of the corpus and the song scores a lot lower on energy than "To Sirius" on the previous page. Here the chord progression is a lot easier to read, as the G, B and C are the pitch classes with the highest magnitude.
+"Creep" by Radiohead scores lowest on valence in the Rock half of the corpus and the song scores a lot lower on energy than "To Sirius" on the previous page. Here the chord progression is a lot easier to read, as the G, B and C are the pitch classes with the highest magnitude.
 
 ### Songs with Weird Structures (1/2)
 
@@ -355,7 +508,7 @@ src="https://open.spotify.com/embed/track/70LcF31zb1H0PyJoS1Sx1r?si=b7cfbb858fd6
 src="https://open.spotify.com/embed/track/4siXNiLG9VJR6Z2kP6fFjv?" width="100%" height="152" frameBorder="0" allowtransparency="true" allow="encrypted-media" data-external="1"></iframe>
 ```
 
-The song "Deliverance" by Opeth is part of the progressive death metal subgenre, which explains its peculiar structure. As visible in the cepstrogram the timbre changes at around a minute and 10 seconds in, when the vocalist starts singing instead of his usual beastly growling and more importantly the guitar tone changes from heavily distorted to clean. At roughly 5 minutes into the song, the clean singing starts again, however this part does feature a distorted guitar, so this is not visible in the cepstrogram. The self-similarity matrices highlight the same clean part as an outlier, and both show a highlight at around 10 minutes in at the introduction of the outro riff.
+The song "Deliverance" by Opeth is part of the Progressive Death Metal subgenre, which explains its peculiar structure. As visible in the cepstrogram the timbre changes at around a minute and 10 seconds in, when the vocalist starts singing instead of his usual low growling and more importantly the guitar tone changes from heavily distorted to clean. At roughly 5 minutes into the song, the clean singing starts again, however this part does feature a distorted guitar, so this is not visible in the cepstrogram. The self-similarity matrices highlight the same clean part as an outlier, and both show a highlight at around 10 minutes in at the introduction of the outro riff.
 
 ### Songs with Weird Structures (2/2)
 
