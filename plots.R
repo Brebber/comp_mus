@@ -1,8 +1,10 @@
 library(tidyverse)
 library(spotifyr)
 library(plotly)
-metal <- get_playlist_audio_features("", "4jOlWW7XLRli6rjThfqlVl?si=781f9fafb8574da1")
-rock <- get_playlist_audio_features("", "43rPmb2v9YWmbotTymQLQE?si=fd6f70a6a61045a3")
+library(compmus)
+library(ggpubr)
+metal <- get_playlist_audio_features("", "4jOlWW7XLRli6rjThfqlVl?si=781f9fafb8574da1") |> add_audio_analysis()
+rock <- get_playlist_audio_features("", "43rPmb2v9YWmbotTymQLQE?si=fd6f70a6a61045a3") |> add_audio_analysis()
 
 metal_stats <- metal |> 
   summarise(
@@ -30,91 +32,35 @@ corpus <-
     metal |> mutate(genre = "Metal")
   )
 
-plot_1 <- corpus |>                    # Start with corpus.
+plt_3 <- corpus |>
   mutate(
-    mode = ifelse(mode == 0, "Minor", "Major"),
-    name = corpus$track.name
+    popularity = track.popularity,
+    name = track.name,
+    sections =
+      map(
+        sections,                                    # sections or segments
+        summarise_at,
+        vars(tempo, duration),             # features of interest
+        list(section_mean = mean, section_sd = sd)   # aggregation functions
+      )
   ) |>
-  ggplot(                     # Set up the plot.
+  unnest(sections) |>
+  ggplot(
     aes(
       name = name,
-      x = valence,
-      y = energy,
-      size = loudness,
-      colour = mode
+      x = tempo,
+      y = tempo_section_sd,
+      colour = genre
     )
   ) +
-  geom_point() +              # Scatter plot.
-  geom_rug(linewidth = 0.1) + # Add 'fringes' to show data distribution.
-  geom_vline(aes(xintercept = mean_valence), corp_stats, color = "purple", linewidth = 0.2, show.legend = TRUE) +
-  geom_hline(aes(yintercept = mean_energy), corp_stats, color = "purple", linewidth = 0.2, show.legend = TRUE) +
-  facet_wrap(~ genre) +    # Separate charts per playlist.
-  scale_x_continuous(         # Fine-tune the x axis.
-    limits = c(0, 1),
-    breaks = c(0, 0.50, 1),   # Use grid-lines for quadrants only.
-    minor_breaks = NULL       # Remove 'minor' grid-lines.
-  ) +
-  scale_y_continuous(         # Fine-tune the y axis in the same way.
-    limits = c(0, 1),
-    breaks = c(0, 0.50, 1),
-    minor_breaks = NULL
-  ) +
-  scale_colour_brewer(        # Use the Color Brewer to choose a palette.
-    type = "qual",            # Qualitative set.
-    palette = "Set1"        # Name of the palette is 'Paired'.
-  ) +
-  scale_size_continuous(      # Fine-tune the sizes of each point.
-    trans = "exp",            # Use an exp transformation to emphasise loud.
-    guide = "none"            # Remove the legend for size.
-  ) +
-  theme_minimal() +             # Use a simpler theme.
-  labs(                       # Make the titles nice.
-    x = "Valence",
-    y = "Energy",
-    colour = "Mode"
+  geom_point(aes(size = duration / 60)) +
+  geom_rug() +
+  theme_minimal() +
+  ylim(0, 5) +
+  labs(
+    x = "Mean Tempo (bpm)",
+    y = "SD Tempo",
+    colour = "Genre",
+    size = "Duration (min)"
   )
-
-ggplotly(p = plot_1)
-
-plot_2 <- corpus |>                    # Start with corpus.
-  mutate(
-    name = corpus$track.name,
-    duration = track.duration_ms,
-    time_signature = ifelse(time_signature == 4, "Even", "Odd")
-  ) |>
-  ggplot(                     # Set up the plot.
-    aes(
-      name = name,
-      x = danceability,
-      y = tempo,
-      size = duration,
-      colour = time_signature
-    )
-  ) +
-  geom_point() +              # Scatter plot.
-  geom_rug(linewidth = 0.1) + # Add 'fringes' to show data distribution.
-  geom_vline(aes(xintercept = mean_dance), corp_stats, color = "purple", linewidth = 0.2, show.legend = TRUE) +
-  geom_hline(aes(yintercept = mean_tempo), corp_stats, color = "purple", linewidth = 0.2, show.legend = TRUE) +
-  facet_wrap(~ genre) +    # Separate charts per playlist.
-  scale_x_continuous(         # Fine-tune the x axis.
-    limits = c(0, 1),
-    breaks = c(0, 0.50, 1),   # Use grid-lines for quadrants only.
-    minor_breaks = NULL       # Remove 'minor' grid-lines.
-  ) +
-  scale_y_continuous(         # Fine-tune the y axis in the same way.
-    limits = c(60, 200),
-    breaks = c(60, 130, 200),
-    minor_breaks = NULL
-  ) +
-  scale_colour_brewer(        # Use the Color Brewer to choose a palette.
-    type = "qual",            # Qualitative set.
-    palette = "Set1"        # Name of the palette is 'Paired'.
-  ) +
-  theme_minimal() +             # Use a simpler theme.
-  labs(                       # Make the titles nice.
-    x = "Danceability",
-    y = "Tempo",
-    colour = "Time signature",
-    size = ''
-  )
-ggplotly(p = plot_2)
+ggplotly(p=plt_3)

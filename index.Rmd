@@ -15,8 +15,8 @@ library(spotifyr)
 library(plotly)
 library(compmus)
 library(ggpubr)
-metal <- get_playlist_audio_features("", "4jOlWW7XLRli6rjThfqlVl?si=781f9fafb8574da1")
-rock <- get_playlist_audio_features("", "43rPmb2v9YWmbotTymQLQE?si=fd6f70a6a61045a3")
+metal <- get_playlist_audio_features("", "4jOlWW7XLRli6rjThfqlVl?si=781f9fafb8574da1") |> add_audio_analysis()
+rock <- get_playlist_audio_features("", "43rPmb2v9YWmbotTymQLQE?si=fd6f70a6a61045a3") |> add_audio_analysis()
 corpus <-
   bind_rows(
     rock |> mutate(genre = "Rock"),
@@ -129,6 +129,45 @@ key_templates <-
     "D#:min", circshift(minor_key, 3)
   )
 ```
+
+### SD and mean tempo
+```{r sd_stuff}
+plt_3 <- corpus |>
+  mutate(
+    popularity = track.popularity,
+    name = track.name,
+    sections =
+      map(
+        sections,                                    # sections or segments
+        summarise_at,
+        vars(tempo, duration),             # features of interest
+        list(section_mean = mean, section_sd = sd)   # aggregation functions
+      )
+  ) |>
+  unnest(sections) |>
+  ggplot(
+    aes(
+      name = name,
+      x = tempo,
+      y = tempo_section_sd,
+      colour = genre
+    )
+  ) +
+  geom_point(aes(size = duration / 60)) +
+  geom_rug() +
+  theme_minimal() +
+  ylim(0, 5) +
+  labs(
+    x = "Mean Tempo (bpm)",
+    y = "SD Tempo",
+    colour = "Genre",
+    size = "Duration (min)"
+  )
+ggplotly(p=plt_3)
+```
+*** 
+Metal tracks tend to have more varying tempos than rock tracks. (WIP)
+
 ### Common Keys 
 ```{r hist}
 
@@ -221,7 +260,7 @@ ggplotly(p=s_keygram)
 src="https://open.spotify.com/embed/track/5CQ30WqJwcep0pYcV4AMNc?si=682bdf162f4c4dcd" width="100%" height="152" frameBorder="0" allowtransparency="true" allow="encrypted-media" data-external="1"></iframe>
 ```
 
-A bit of a cliche, sure. 
+As this song is in the key of Am, the keygram seems to be rather accurate. As this song is quite long and has an interesting structure I'd expected the keygran to do worse.
 
 ### Back to Keys (2/3)
 
@@ -262,7 +301,7 @@ ggplotly(p=m_keygram)
 src="https://open.spotify.com/embed/track/2MuWTIM3b0YEAskbeeFE1i?si=f1b442b834af43b4" width="100%" height="152" frameBorder="0" allowtransparency="true" allow="encrypted-media" data-external="1"></iframe>
 ```
 
-Em
+This song is in the key of Em, which is also pretty obvious from the keygram. Before and a bit after the 300s mark the keygram seems to do a little worse, but overall it gets it right.
 
 ### Back to Keys (3/3)
 ```{r lot}
@@ -302,7 +341,7 @@ ggplotly(p=l_keygram)
 src="https://open.spotify.com/embed/track/2ka0Oum3mNMGGXL9gBqdkq?si=d0cc5f6e3df641ba" width="100%" height="152" frameBorder="0" allowtransparency="true" allow="encrypted-media" data-external="1"></iframe>
 ```
 
-Unlike the previous two examples, it doesn't work for this song at all.
+Unlike the previous two examples, it doesn't work for this song at all. It's supposed to be in Em, however from the keygram that is impossible to tell.
 
 ### Introducing My Taste in Music
 
