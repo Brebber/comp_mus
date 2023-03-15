@@ -134,8 +134,8 @@ key_templates <-
 ### Histogram of Tempi
 ```{r tmphist}
 hist <-  
-  ggplot(corpus, aes(x=10*round(tempo/10))) + 
-  geom_histogram(stat="count", binwidth = 1, color = 'black', fill = 'blue') +
+  ggplot(corpus, aes(x=tempo)) + 
+  geom_histogram(binwidth = 5, color = 'black', fill = 'blue') +
   facet_wrap(~ genre) +
   theme_minimal()+
   theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1),
@@ -146,7 +146,20 @@ hist <-
 ggplotly(p=hist)
 ```
 ***
-In this histogram . . .
+In this histogram it's quite clear that the songs in the Metal playlist overall tend to be a bit slower than the songs in the Rock playlist. This could might be because the songs in the Metal playlist tend to have more shifting tempos, as seen in one of my earlier visualizations on the Corpus tab.
+
+### Tempogram Deliverance
+
+![](deliv_tmp.png)
+
+***
+In the tempogram of the song the highlights seen in it's SSM aren't visible, so the tempo remains the same but it's just the instrumental that changes. This is quite interesting as I find the clean passage near the start of the song to be slower than the intro. The part where all music suddenly drops out at the beginning of this clean part is visible in the tempogram however. There are some highlights at around 160 bpm throughout the song, but those are probably just a product of tempo octaves. 
+
+### Tempogram Paranoid Android
+![](para_tmp.png)
+
+***
+The changes from the softer to the aggressive parts are quite clear from the tempogram, even moreso than from the SSMs. However the tempogram does not seem to be sure as to what the tempo of the ending is. I had expected it to fall back down to around 80 bpm, so the same as the start of the song. Again there's some visual noise, however it doesn't appear to be at the tempo octaves.
 
 # Corpus {.storyboard}
 ### Introducing My Taste in Music
@@ -302,6 +315,10 @@ plt_3 <- corpus |>
   ) +
   geom_point(aes(size = duration / 60)) +
   geom_rug() +
+  scale_colour_brewer(        # Use the Color Brewer to choose a palette.
+    type = "qual",            # Qualitative set.
+    palette = "Set1"        # Name of the palette is 'Paired'.
+  ) +
   theme_minimal() +
   ylim(0, 5) +
   labs(
@@ -315,7 +332,7 @@ ggplotly(p=plt_3)
 *** 
 Metal tracks tend to have more varying tempos than rock tracks. (WIP)
 
-# Songs with Low Valence {.storyboard}
+# Emotions {.storyboard}
 
 ### Songs with Low Valence (1/3)
 ```{r tosir}
