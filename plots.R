@@ -11,14 +11,18 @@ metal_stats <- metal |>
     mean_valence = mean(metal$valence),
     mean_energy = mean(metal$energy),
     mean_dance = mean(metal$danceability),
-    mean_tempo = mean(metal$tempo)
+    mean_tempo = mean(metal$tempo),
+    mean_loudness = mean(metal$loudness),
+    mean_pop = mean(metal$track.popularity)
     )
 rock_stats <- rock |> 
   summarise(
     mean_valence = mean(rock$valence),
     mean_energy = mean(rock$energy),
     mean_dance = mean(rock$danceability),
-    mean_tempo = mean(rock$tempo)
+    mean_tempo = mean(rock$tempo),
+    mean_loudness = mean(rock$loudness),
+    mean_pop = mean(rock$track.popularity)
     )
 
 corp_stats <-
@@ -32,35 +36,48 @@ corpus <-
     metal |> mutate(genre = "Metal")
   )
 
-plt_3 <- corpus |>
+plot_2 <- corpus |>                    # Start with corpus.
   mutate(
-    popularity = track.popularity,
-    name = track.name,
-    sections =
-      map(
-        sections,                                    # sections or segments
-        summarise_at,
-        vars(tempo, duration),             # features of interest
-        list(section_mean = mean, section_sd = sd)   # aggregation functions
-      )
+    name = corpus$track.name,
+    popularity = corpus$track.popularity,
+    duration = track.duration_ms,
+    time_signature = ifelse(time_signature == 4, "Even", "Odd")
   ) |>
-  unnest(sections) |>
-  ggplot(
+  ggplot(                     # Set up the plot.
     aes(
       name = name,
-      x = tempo,
-      y = tempo_section_sd,
-      colour = genre
+      x = popularity,
+      y = tempo,
+      size = duration/60,
+      colour = time_signature
     )
   ) +
-  geom_point(aes(size = duration / 60)) +
-  geom_rug() +
-  theme_minimal() +
-  ylim(0, 5) +
-  labs(
-    x = "Mean Tempo (bpm)",
-    y = "SD Tempo",
-    colour = "Genre",
-    size = "Duration (min)"
+  geom_point() +              # Scatter plot.
+  geom_rug(linewidth = 0.1) + # Add 'fringes' to show data distribution.
+  geom_vline(aes(xintercept = mean_pop), corp_stats, color = "purple", linewidth = 0.2, show.legend = TRUE) +
+  geom_hline(aes(yintercept = mean_tempo), corp_stats, color = "purple", linewidth = 0.2, show.legend = TRUE) +
+  facet_wrap(~ genre) +    # Separate charts per playlist.
+  scale_x_continuous( # Fine-tune the x axis.
+    limits = c(0, 100),
+    breaks = c(0, 50, 100),   # Use grid-lines for quadrants only.
+    minor_breaks = NULL       # Remove 'minor' grid-lines.
+  ) +
+  scale_y_continuous(         # Fine-tune the y axis in the same way.
+    limits = c(60, 200),
+    breaks = c(60, 130, 200),
+    minor_breaks = NULL
+  ) +
+  scale_colour_brewer(        # Use the Color Brewer to choose a palette.
+    type = "qual",            # Qualitative set.
+    palette = "Set1"        # Name of the palette is 'Paired'.
+  ) +
+  theme_minimal() +             # Use a simpler theme.
+  labs(                       # Make the titles nice.
+    x = "Popularity",
+    y = "Tempo",
+    colour = "Time signature",
+    size = ''
   )
-ggplotly(p=plt_3)
+ggplotly(p = plot_2)
+
+
