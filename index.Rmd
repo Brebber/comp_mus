@@ -134,36 +134,60 @@ key_templates <-
   )
 ```
 # New Stuff {.storyboard}
+### KNN Classification of Nebulous Subgenres
+![](knnconfusionmatrix.png)
 
-### Histogram of Tempi
-```{r tmphist}
-hist <-  
-  ggplot(corpus, aes(x=tempo)) + 
-  geom_histogram(binwidth = 5, color = 'black', fill = 'blue') +
-  facet_wrap(~ genre) +
-  theme_minimal()+
-  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1),
-        axis.title.x = element_blank(),
-        axis.title.y = element_blank()
-  )
+***
 
-ggplotly(p=hist)
+I used my (very limited) corpus to train a KNN classifier. I used basically every numerical feature Spotify calculated, as I have not been able to find any that clearly distinguish the songs in my Metal playlist from those in my Rock playlist. I set k=10, as there are 100 songs in my playlist, and 10 is the square root of 100. I have tried other values for k but none outperform k=10.\
+As visible in the confusion matrix this algorithm performs fairly well, but it is most definitely biased as the dataset is quite small. I have decided to run three little experiments with the KNN, to see if three different genres would be considered Metal or Rock. More on the experiments on the following pages.
+
+### Is Glam Metal Really Metal? (according to the KNN)
+```{=html}
+<iframe style="border-radius:20px"
+src="https://open.spotify.com/playlist/1DAC3LdsyquzqziE5Ucja1?si=0e04ea6b51e140af" width="100%" height="152" frameBorder="0" allowtransparency="true" allow="encrypted-media" data-external="1"></iframe>
 ```
-***
-In this histogram it's quite clear that the songs in the Metal playlist overall tend to be a bit slower than the songs in the Rock playlist. This could might be because the songs in the Metal playlist tend to have more shifting tempos, as seen in one of my earlier visualizations on the Corpus tab.
+#### Introduction
+The first genre on the border between Rock and Metal is Glam Metal or Hair Metal. This was a popular subgenre of Metal in the '80s, which (un)fortunately basically went extinct because of the genre on the next page. For this experiment I created a 10 song playlist which is meant to provide a good but brief overview of the genre, and functions as our first test subject. I expect most of these songs to be classed as Rock music, because I think the genre is closer to Hard Rock than it is to Metal, because it is more upbeat and happy than the Metal in my corpus playlist and because I only picked 10 songs.
 
-### Tempogram Deliverance
+#### Results
+This needs a visual of some sort.\
+Metal: Both Mötley Crüe songs, 'Welcome To The Jungle', 'Pour Some Sugar On Me'\
+Rock: Rest\ 
+Metal Ratio: 4/10\
 
-![](deliv_tmp.png)
+#### Conclusion
+As expected, Glam Metal does not score very high, although higher than I expected honestly.
 
-***
-In the tempogram of the song the highlights seen in it's SSM aren't visible, so the tempo remains the same but it's just the instrumental that changes. This is quite interesting as I find the clean passage near the start of the song to be slower than the intro. The part where all music suddenly drops out at the beginning of this clean part is visible in the tempogram however. There are some highlights at around 160 bpm throughout the song, but those are probably just a product of tempo octaves. 
+### The Genre that 'Killed' Glam 
+```{=html}
+<iframe style="border-radius:20px"
+src="https://open.spotify.com/playlist/1rWZDin7auum63WpMfva5j?si=eef274215e7e46d9" width="100%" height="152" frameBorder="0" allowtransparency="true" allow="encrypted-media" data-external="1"></iframe>
+```
+#### Introduction
+The second genre I wanted to take a look at is Grunge, the early '90s Alternative Rock lovechild between Punk-Rock and Metal. For this playlist I added 5 heavy songs and 5 a bit slower songs, both are common in this genre, so my guess would be that the first 5 songs are classed as Metal and the last 5 are classed as Rock. 
 
-### Tempogram Paranoid Android
-![](para_tmp.png)
+#### Results
+This needs a visual of some sort.\
+Metal: 'Rusty Cage', 'Heart-Shaped Box', 'Rooster'.
 
-***
-The changes from the softer to the aggressive parts are quite clear from the tempogram, even moreso than from the SSMs. However the tempogram does not seem to be sure as to what the tempo of the ending is. I had expected it to fall back down to around 80 bpm, so the same as the start of the song. Again there's some visual noise, however it doesn't appear to be at the tempo octaves.
+#### Conclusion
+Interestingly enough the algorithm did not classify the songs as I expected. Grunge is slightly less of a Metal subgenre than Glam Metal according to the KNN.
+
+### Nu-Metal
+```{=html}
+<iframe style="border-radius:20px"
+src="https://open.spotify.com/playlist/1OVisrN9f3HCJ92DSnRAbd?si=568aff9ac0b54662" width="100%" height="152" frameBorder="0" allowtransparency="true" allow="encrypted-media" data-external="1"></iframe>
+```
+#### Introduction
+The third genre I chose is Nu-Metal, which confusingly enough is not considered to be 'real Metal' by the majority of the Metal community. That probably has more to do with the quality of some of the music in the genre than the actual sound of it. For this playlist I picked 10 songs that I feel capture the sound of the genre pretty well. I predict that the KNN will class most of the songs in this playlist as Metal.
+
+#### Results
+Slipnot and Korn are Metal, rest isn't.
+
+#### Conclusion
+Same score as Glam...
+
 
 # Corpus {.storyboard}
 ### Introducing My Taste in Music
@@ -583,6 +607,22 @@ ggplotly(p=c_chordogram)
 As "Creep" has an interesting but simple chord progression, it's chordogram is clear. The four chords constantly looping are G, B, C and Cm and those are the only four chords in the song.
 
 # Structures {.storyboard}
+### Histogram of Tempi
+```{r tmphist}
+hist <-  
+  ggplot(corpus, aes(x=tempo)) + 
+  geom_histogram(binwidth = 5, color = 'black', fill = 'blue') +
+  facet_wrap(~ genre) +
+  theme_minimal()+
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1),
+        axis.title.x = element_blank(),
+        axis.title.y = element_blank()
+  )
+
+ggplotly(p=hist)
+```
+***
+In this histogram it's quite clear that the songs in the Metal playlist overall tend to be a bit slower than the songs in the Rock playlist. This could might be because the songs in the Metal playlist tend to have more shifting tempos, as seen in one of my earlier visualizations on the Corpus tab.
 
 ### Songs with Weird Structures (1/2)
 
@@ -597,6 +637,13 @@ src="https://open.spotify.com/embed/track/4siXNiLG9VJR6Z2kP6fFjv?" width="100%" 
 
 The song "Deliverance" by Opeth is part of the Progressive Death Metal subgenre, which explains its peculiar structure. As visible in the cepstrogram the timbre changes at around a minute and 10 seconds in, when the vocalist starts singing instead of his usual low growling and more importantly the guitar tone changes from heavily distorted to clean. At roughly 5 minutes into the song, the clean singing starts again, however this part does feature a distorted guitar, so this is not visible in the cepstrogram. The self-similarity matrices highlight the same clean part as an outlier, and both show a highlight at around 10 minutes in at the introduction of the outro riff.
 
+### Tempogram Deliverance
+
+![](deliv_tmp.png)
+
+***
+In the tempogram of the song the highlights seen in its SSM aren't visible, so the tempo remains the same but it's just the instrumental that changes. This is quite interesting as I find the clean passage near the start of the song to be slower than the intro. The part where all music suddenly drops out at the beginning of this clean part is visible in the tempogram however. There are some highlights at around 160 bpm throughout the song, but those are probably just a product of tempo octaves.
+
 ### Songs with Weird Structures (2/2)
 
 ![](paranoid.png)
@@ -609,3 +656,9 @@ src="https://open.spotify.com/embed/track/6LgJvl0Xdtc73RJ1mmpotq?si=cb296db6ab77
 ```
 
 Another song in my corpus with an interesting structure is "Paranoid Android" by Radiohead. However where "Deliverance" has a clear standout moment, this song consists of three audibly different parts: the intro, the aggressive part and the "rain down" part (from around 3:35 to around 6:10). These different parts aren't clearly visible in the chroma based SSM unfortunately, as it shows so many significant changes it becomes a bit messy. These changes are visible in the cepstrogram and the timbre based SSM, however. This may have something to do with the fact the the song stays in the same key, but the instrumentation varies from an acoustic guitar in the intro and the "rain down" part to distorted guitars in the aggressive parts.
+
+### Tempogram Paranoid Android
+![](para_tmp.png)
+
+***
+The changes from the softer to the aggressive parts are quite clear from the tempogram, even moreso than from the SSMs. However the tempogram does not seem to be sure as to what the tempo of the ending is. I had expected it to fall back down to around 80 bpm, so the same as the start of the song. Again there's some visual noise, however it doesn't appear to be at the tempo octaves.
