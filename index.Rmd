@@ -134,59 +134,40 @@ key_templates <-
   )
 ```
 # New Stuff {.storyboard}
+
 ### KNN Classification of Nebulous Subgenres
-![](knnconfusionmatrix.png)
+![](confusionmatrixknn.png)
 
 ***
 
 I used my (very limited) corpus to train a KNN classifier. I used basically every numerical feature Spotify calculated, as I have not been able to find any that clearly distinguish the songs in my Metal playlist from those in my Rock playlist. I set k=10, as there are 100 songs in my playlist, and 10 is the square root of 100. I have tried other values for k but none outperform k=10.\
-As visible in the confusion matrix this algorithm performs fairly well, but it is most definitely biased as the dataset is quite small. I have decided to run three little experiments with the KNN, to see if three different genres would be considered Metal or Rock. More on the experiments on the following pages.
+As visible in the confusion matrix this algorithm performs fairly well, but it is most definitely biased as the dataset is quite small, to (hopefully) improve it I performed some feature analysis to see what features correlate the most with genre.
 
-### Is Glam Metal Really Metal? (according to the KNN)
-```{=html}
-<iframe style="border-radius:20px"
-src="https://open.spotify.com/playlist/1DAC3LdsyquzqziE5Ucja1?si=0e04ea6b51e140af" width="100%" height="152" frameBorder="0" allowtransparency="true" allow="encrypted-media" data-external="1"></iframe>
+### Feature Analysis for Classification 
+![](corrmat.png)
+
+***
+The popularity of a track, the valence and the duration of the track seem to be the features that correlate with genre the most, followed by danceability, energy, acousticness and instrumentalness. Making a KNN with only the top 3 features and a KNN with the top 7 seems to be a viable strategy.
+
+### Final KNN
+![](confusionmatrixknn(k=8,n_features=3).png)
+
+***
+After some teaking this KNN algortithm had the best results, this is the one I'll be using in the following experiment. I'll be looking at three genres which are not featured in my main playlist, and see how "Metal" they are according to this classifier.
+
+
+### Results
+```{r knn}
+knn_res_plot <- readRDS(file = "data/knn_res_plot.RDS")
+knn_res_plot
 ```
-#### Introduction
-The first genre on the border between Rock and Metal is Glam Metal or Hair Metal. This was a popular subgenre of Metal in the '80s, which (un)fortunately basically went extinct because of the genre on the next page. For this experiment I created a 10 song playlist which is meant to provide a good but brief overview of the genre, and functions as our first test subject. I expect most of these songs to be classed as Rock music, because I think the genre is closer to Hard Rock than it is to Metal, because it is more upbeat and happy than the Metal in my corpus playlist and because I only picked 10 songs.
+*** 
+#### Quick Introduction to the Genres
+TODO
 
-#### Results
-This needs a visual of some sort.\
-Metal: Both Mötley Crüe songs, 'Welcome To The Jungle', 'Pour Some Sugar On Me'\
-Rock: Rest\ 
-Metal Ratio: 4/10\
+#### Expectations
 
 #### Conclusion
-As expected, Glam Metal does not score very high, although higher than I expected honestly.
-
-### The Genre that 'Killed' Glam 
-```{=html}
-<iframe style="border-radius:20px"
-src="https://open.spotify.com/playlist/1rWZDin7auum63WpMfva5j?si=eef274215e7e46d9" width="100%" height="152" frameBorder="0" allowtransparency="true" allow="encrypted-media" data-external="1"></iframe>
-```
-#### Introduction
-The second genre I wanted to take a look at is Grunge, the early '90s Alternative Rock lovechild between Punk-Rock and Metal. For this playlist I added 5 heavy songs and 5 a bit slower songs, both are common in this genre, so my guess would be that the first 5 songs are classed as Metal and the last 5 are classed as Rock. 
-
-#### Results
-This needs a visual of some sort.\
-Metal: 'Rusty Cage', 'Heart-Shaped Box', 'Rooster'.
-
-#### Conclusion
-Interestingly enough the algorithm did not classify the songs as I expected. Grunge is slightly less of a Metal subgenre than Glam Metal according to the KNN.
-
-### Nu-Metal
-```{=html}
-<iframe style="border-radius:20px"
-src="https://open.spotify.com/playlist/1OVisrN9f3HCJ92DSnRAbd?si=568aff9ac0b54662" width="100%" height="152" frameBorder="0" allowtransparency="true" allow="encrypted-media" data-external="1"></iframe>
-```
-#### Introduction
-The third genre I chose is Nu-Metal, which confusingly enough is not considered to be 'real Metal' by the majority of the Metal community. That probably has more to do with the quality of some of the music in the genre than the actual sound of it. For this playlist I picked 10 songs that I feel capture the sound of the genre pretty well. I predict that the KNN will class most of the songs in this playlist as Metal.
-
-#### Results
-Slipnot and Korn are Metal, rest isn't.
-
-#### Conclusion
-Same score as Glam...
 
 
 # Corpus {.storyboard}
@@ -197,7 +178,7 @@ Same score as Glam...
 src="https://open.spotify.com/embed/playlist/09ybINQumucmE0BMdYakx2?" width="100%" height="152" frameBorder="0" allowtransparency="true" allow="encrypted-media" data-external="1"></iframe>
 ```
 
-For this project I have chosen 10 bands, 5 of which are not considered Rock but not Metal bands and 5 of which are considered Metal bands. Metal is a subgenre of Rock that has a multitude of subgenres of itself. Metal is defined as: ("a type of Rock music with a very strong beat played very loud on electric guitars")[https://www.oxfordlearnersdictionaries.com/definition/american_english/heavy-metal#:~:text=heavy%20metal-,noun,very%20loud%20on%20electric%20guitars]. Which is a bit of a vague definition in my opinion. When does a song have a strong enough beat or when is it played loud enough to be considered metal? My goal is to see how easily distinguishable these genres actually are if we looked at different features of songs in both playlists.\
+For this project I have chosen 10 bands, 5 of which are not considered Rock but not Metal bands and 5 of which are considered Metal bands. Metal is a subgenre of Rock that has a multitude of subgenres of itself. Metal is defined as: ["a type of Rock music with a very strong beat played very loud on electric guitars"](https://www.oxfordlearnersdictionaries.com/definition/american_english/heavy-metal#). Which is a bit of a vague definition in my opinion. When does a song have a strong enough beat or when is it played loud enough to be considered metal? My goal is to see how easily distinguishable these genres actually are if we looked at different features of songs in both playlists.\
 
 #### Band selection
 The Rock bands I picked are: Queens of the Stone Age, Radiohead, Queen, Led Zeppelin and Arctic Monkeys. \
@@ -270,7 +251,7 @@ By looking at this plot it's obvious that the songs in the Metal part of the pla
 I will be exploring this topic under [this](#emotions) tab.
 
 
-### More Aggressive = Faster?
+### Tempo and Popularity
 ```{r rhythm}
 plot_2 <- corpus |>                    # Start with corpus.
   mutate(
@@ -318,7 +299,7 @@ ggplotly(p = plot_2)
 ```
 ***
 
-Contrary to the definition of the genre, the mean tempo of the Metal playlist is actually slightly lower than the mean tempo of the Rock playlist. This could be because Metal tracks feature more tempo changes and have are often structured differently than (popular) Rock tracks. This is a topic I will explore more in the (structures)[#structures] tab. However as it only differs 3 bpm, it's not a significant difference.\
+Contrary to the definition of the genre, the mean tempo of the Metal playlist is actually slightly lower than the mean tempo of the Rock playlist. This could be because Metal tracks feature more tempo changes and have are often structured differently than (popular) Rock tracks. This is a topic I will explore more in the [structures](#structures) tab. However as it only differs 3 bpm, it's not a significant difference.\
 As I expected, the songs on my metal playlist are slightly less popular than the songs in my Rock playlist. This could be due to track and mostly band selection, as there's no clear indication that tempo has anything to do with it. Interestingly though, the least popular Metal track is still more popular than the least popular Rock tracks.\
 
 ### SD and mean tempo
@@ -381,7 +362,7 @@ hist <-
 ggplotly(p=hist)
 ```
 ***
-The key a song is written in plays a major role in the emotional perception of a track. Minor keys are often deemed sadder or less energetic, while major keys are often described as happier or more energetic. As seen on [this tab](###more-aggressive-=-faster?), these descriptions aren't alway accurate.\
+The key a song is written in plays a major role in the emotional perception of a track. Minor keys are often deemed sadder or less energetic, while major keys are often described as happier or more energetic. As seen on [this tab](###tempo-and-popularity), these descriptions aren't always accurate.\
 For every existent key, there is at least one song in the Rock playlist that uses it, this is not the case for the Metal playlist however. The popularity of Em among Metal tracks is unsurprising, as the key represents [grief, mournfulness and restlessness of spirit](https://interlude.hk/feel-key-e-minor/#:~:text=Pauer's%20key%20characteristics%20for%20E,of%20pieces%20in%20E%20minor.). For the Rock playlist there is not really a key that stands out as much.
 
 ### Back to Keys (1/3)
