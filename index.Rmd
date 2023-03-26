@@ -153,22 +153,23 @@ The popularity of a track, the valence and the duration of the track seem to be 
 ![](confusionmatrixknn(k=8,n_features=3).png)
 
 ***
-After some teaking this KNN algortithm had the best results, this is the one I'll be using in the following experiment. I'll be looking at three genres which are not featured in my main playlist, and see how "Metal" they are according to this classifier.
+After some tweaking this KNN algorithm had the best results, this is the one I'll be using in the following experiment. I'll be looking at three genres which are not featured in my main playlist, and see how "Metal" they are according to this classifier.
+For this experiment I created three new playlists, a [Glam Metal playlist](https://open.spotify.com/playlist/1DAC3LdsyquzqziE5Ucja1?si=90f62ead04874e5e), a [Grunge playlist](https://open.spotify.com/playlist/1rWZDin7auum63WpMfva5j?si=089b589af6ba4bc2) and finally a [Nu Metal playlist](https://open.spotify.com/playlist/1OVisrN9f3HCJ92DSnRAbd?si=e98523da23dc45bc). As the names suggest two of these genres are subgenres of Metal, however Grunge is a genre in which some artists take heavy influence from Metal. Glam Metal, or Hair Metal as it's sometimes called for the musicians' subtle usage of hairspray, was a popular genre in the '80s. Because of its popularity, the lyrical themes and the overall sound of the music this genre is closer to Hard Rock than to Metal in my opinion. Because I don't listen to this genre at all I predict these songs won't have much of an overlap with the Metal part of my playlist, but because of the small number of features my classifier works with I can't be sure what it will predict.\
+Although it I would consider it a subgenre of Alternative Rock, I'd describe Grunge as a mix between Punk Rock and Metal. The Grunge playlist I created consists of five songs that are closer to Metal and five that are closer to Rock, in my opinion at least.\
+I chose Nu Metal as the final genre as it is not considered "real Metal" by the type of Metal fan that would curate an online music forum. This Alternative Metal subgenre blends elements of various Metal subgenres, Hip-Hop and numerous other genres including Grunge. Considering the songs in this playlist I think most of them should be considered Metal, but I'm not sure if my KNN classifier will agree.\
 
-
-### Results
+### Using the KNN for Classification
 ```{r knn}
 knn_res_plot <- readRDS(file = "data/knn_res_plot.RDS")
 knn_res_plot
 ```
+
 *** 
-#### Quick Introduction to the Genres
-TODO
 
-#### Expectations
-
-#### Conclusion
-
+My predictions were far off. More songs in the Glam Metal playlist were classed as Metal than I originally thought, so the genre isn't misnamed after all.\
+The Grunge playlist was classed as being half Metal, which I hoped for when I picked the songs, however two of the five songs that the KNN calls Metal were from the slower part of the playlist. Especially "Alive" by Pearl Jam had a surprising outcome, as that might be the softest song out of that playlist.\
+The Nu-Metal only had three Metal songs in it apparently, but this might be because there are no Nu-Metal songs in my original corpus. Slipknot's "The Heretic Anthem" being classed as Rock was a surprise for me here, especially because the other Slipknot song is considered Metal.\
+If I had more songs in my original corpus, and more features with a high correlation with genre these predictions would be a lot more accurate, however this experiment has provided me some important insights into my corpus.
 
 # Corpus {.storyboard}
 ### Introducing My Taste in Music
